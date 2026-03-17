@@ -27,11 +27,11 @@
   ],
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "@types/node": "^24.3.0",
-    "gts": "^6.0.2",
-    "typedoc": "^0.28.12",
-    "typescript": "^5.9.2",
-    "vitest": "^4.0.0"
+    "@types/node": "^25.5.0",
+    "gts": "^7.0.0",
+    "typedoc": "^0.28.17",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   },
   "scripts": {
     "lint": "gts lint",
