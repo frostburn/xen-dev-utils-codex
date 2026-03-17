@@ -8,7 +8,7 @@ const compat = new FlatCompat({
 });
 
 const gtsConfigs = compat
-  .extends('./node_modules/gts/.eslintrc.json')
+  .extends('./node_modules/gts/')
   .map(config => ({...config, files: ['**/*.ts']}));
 
 module.exports = [
