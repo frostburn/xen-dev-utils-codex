@@ -7,15 +7,11 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-const gtsConfigs = compat
-  .extends('./node_modules/gts/')
-  .map(config => ({...config, files: ['**/*.ts']}));
-
 module.exports = [
   {
-    ignores: ['legacy/**', 'dist/**', 'docs/**'],
+    ignores: ['legacy/**', 'dist/**', 'docs/**', '**/*.js'],
   },
-  ...gtsConfigs,
+  ...compat.extends('./node_modules/gts/'),
   {
     files: ['**/*.ts'],
     languageOptions: {
