@@ -4,6 +4,7 @@ describe('sum polyfill wrapper', () => {
   it('uses Math.sumPrecise when available in the runtime', async () => {
     vi.resetModules();
 
+    const hasOwnSumPrecise = Object.hasOwn(Math, 'sumPrecise');
     const original = (Math as Partial<Math & {sumPrecise: (values: Iterable<number>) => number}>).sumPrecise;
     const intrinsic = vi.fn((values: Iterable<number>) =>
       Array.from(values).reduce((acc, value) => acc + value, 0),
@@ -16,7 +17,11 @@ describe('sum polyfill wrapper', () => {
       expect(intrinsic).toHaveBeenCalledOnce();
       expect(intrinsic).toHaveBeenCalledWith([1, 2, 3]);
     } finally {
-      (Math as Partial<Math & {sumPrecise: (values: Iterable<number>) => number}>).sumPrecise = original;
+      if (hasOwnSumPrecise) {
+        (Math as Partial<Math & {sumPrecise: (values: Iterable<number>) => number}>).sumPrecise = original;
+      } else {
+        delete (Math as Partial<Math & {sumPrecise: (values: Iterable<number>) => number}>).sumPrecise;
+      }
     }
   });
 });
