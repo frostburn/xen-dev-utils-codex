@@ -22,12 +22,10 @@ export default [
       },
     },
     rules: {
-      'no-empty': 0,
-      'no-constant-condition': 0,
       'prefer-const': ['error', {destructuring: 'all'}],
       'no-restricted-syntax': ['error', 'SequenceExpression'],
-      '@typescript-eslint/no-explicit-any': 0,
-      '@typescript-eslint/ban-ts-comment': 0,
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/ban-ts-comment': 'error',
     },
   },
 ];

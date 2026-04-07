@@ -19,7 +19,7 @@ export * from './hnf.js';
 export {sum} from './polyfills/sum-precise.js';
 
 export interface AnyArray {
-  [key: number]: any;
+  [key: number]: unknown;
   length: number;
 }
 
