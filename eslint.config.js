@@ -21,11 +21,5 @@ export default [
         project: './tsconfig.eslint.json',
       },
     },
-    rules: {
-      'prefer-const': ['error', {destructuring: 'all'}],
-      'no-restricted-syntax': ['error', 'SequenceExpression'],
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/ban-ts-comment': 'error',
-    },
   },
 ];

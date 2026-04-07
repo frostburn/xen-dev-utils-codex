@@ -466,7 +466,9 @@ export function monzoToCents(monzo: Monzo) {
       return result;
     }
   }
-  let {numerator, denominator} = monzoToBigNumeratorDenominator(monzo);
+  const {numerator, denominator: initialDenominator} =
+    monzoToBigNumeratorDenominator(monzo);
+  let denominator = initialDenominator;
   let delta = numerator - denominator;
   // The answer is smaller than 10 cents so no need to check delta here or worry about its sign
   while (denominator >= IEEE_LIMIT) {
