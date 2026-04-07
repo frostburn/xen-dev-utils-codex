@@ -165,7 +165,7 @@ export function hnf<T extends number | bigint>(A: T[][]): T[][] {
  * Prune rows filled with falsy values from a 2-D matrix.
  * @param A Matrix to prune in-place.
  */
-export function pruneZeroRows(A: unknown[][]) {
+export function pruneZeroRows<T>(A: T[][]): void {
   for (let i = 0; i < A.length; ++i) {
     if (!A[i].some(Boolean)) {
       A.splice(i, 1);
