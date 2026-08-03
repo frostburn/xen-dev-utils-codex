@@ -416,13 +416,21 @@ describe('Sparse monzos', () => {
     expect(factors.get(5)).toBe(-1);
   });
 
-  it('factorizes BigInts', () => {
-    const factors = primeFactorize(2n ** 100n * 3n ** 50n);
+  it('factorizes safe BigInts', () => {
+    const factors = primeFactorize(12n);
     expect(factors).toEqual(
       new Map([
-        [2, 100],
-        [3, 50],
+        [2, 2],
+        [3, 1],
       ]),
+    );
+  });
+
+  it('gives up on RSA-260', () => {
+    const rsa260 =
+      22112825529529666435281085255026230927612089502470015394413748319128822941402001986512729726569746599085900330031400051170742204560859276357953757185954298838958709229238491006703034124620545784566413664540684214361293017694020846391065875914794251435144458199n;
+    expect(() => primeFactorize(rsa260)).toThrow(
+      `Factorization not implemented for residuals above ${Number.MAX_SAFE_INTEGER}.`,
     );
   });
 

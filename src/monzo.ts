@@ -836,9 +836,8 @@ function rhoCascade(n: number) {
 /**
  * Factorize a number into a `Map` instance with prime numbers as keys and their multiplicity as values.
  *
- * BigInt inputs are reduced by their denominator before factorization. Known small
- * prime factors are then removed until the remaining factors fit safely in a
- * Number.
+ * BigInt inputs are reduced by their denominator before the remaining factors are
+ * converted to Numbers.
  * @param value Rational number or integer numerator to factorize.
  * @param denominator Optional denominator. It must have the same numeric type as
  * the numerator.
@@ -849,9 +848,10 @@ export function primeFactorize(
   denominator?: bigint,
 ): Map<number, number>;
 export function primeFactorize(
-  value: FractionValue,
-  denominator?: number,
+  value: number,
+  denominator: number,
 ): Map<number, number>;
+export function primeFactorize(value: FractionValue): Map<number, number>;
 export function primeFactorize(
   value: FractionValue | bigint,
   denominator?: number | bigint,
@@ -882,28 +882,6 @@ export function primeFactorize(
     }
     numerator = bigAbs(numerator);
     divisor = bigAbs(divisor);
-
-    for (let i = 0; i < BIG_INT_PRIMES.length; ++i) {
-      const prime = BIG_INT_PRIMES[i];
-      let exponent = 0;
-      while (numerator % prime === 0n) {
-        numerator /= prime;
-        ++exponent;
-      }
-      while (divisor % prime === 0n) {
-        divisor /= prime;
-        --exponent;
-      }
-      if (exponent) {
-        result.set(PRIMES[i], exponent);
-      }
-      if (
-        numerator <= BigInt(Number.MAX_SAFE_INTEGER) &&
-        divisor <= BigInt(Number.MAX_SAFE_INTEGER)
-      ) {
-        break;
-      }
-    }
 
     if (
       numerator > BigInt(Number.MAX_SAFE_INTEGER) ||
