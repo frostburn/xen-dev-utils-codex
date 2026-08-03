@@ -19,6 +19,8 @@ export type ProtoFractionalMonzo = FractionValue[];
 // The limit at which ((n ^ (n-1)) & n) is no longer equal to the two's factor.
 const BIT_MAGIC_LIMIT = 2 ** 31;
 
+const BIG_INT_THRESHOLD = BigInt(Number.MAX_SAFE_INTEGER);
+
 /**
  * Calculate the absolute value of a BigInt.
  * @param n Integer to measure.
@@ -883,10 +885,29 @@ export function primeFactorize(
     numerator = bigAbs(numerator);
     divisor = bigAbs(divisor);
 
-    if (
-      numerator > BigInt(Number.MAX_SAFE_INTEGER) ||
-      divisor > BigInt(Number.MAX_SAFE_INTEGER)
-    ) {
+    for (let i = 0; i < BIG_INT_PRIMES.length; ++i) {
+      const prime = BIG_INT_PRIMES[i];
+      let exponent = 0;
+      while (numerator % prime === 0n) {
+        numerator /= prime;
+        ++exponent;
+      }
+      if (exponent === 0) {
+        // GCD should've cancelled out common primes
+        while (divisor % prime === 0n) {
+          divisor /= prime;
+          --exponent;
+        }
+      }
+      if (exponent) {
+        result.set(PRIMES[i], exponent);
+      }
+      if (numerator <= BIG_INT_THRESHOLD && divisor <= BIG_INT_THRESHOLD) {
+        break;
+      }
+    }
+
+    if (numerator > BIG_INT_THRESHOLD || divisor > BIG_INT_THRESHOLD) {
       throw new Error(
         `Factorization not implemented for residuals above ${Number.MAX_SAFE_INTEGER}.`,
       );
