@@ -416,6 +416,40 @@ describe('Sparse monzos', () => {
     expect(factors.get(5)).toBe(-1);
   });
 
+  it('factorizes BigInts', () => {
+    const factors = primeFactorize(2n ** 100n * 3n ** 50n);
+    expect(factors).toEqual(
+      new Map([
+        [2, 100],
+        [3, 50],
+      ]),
+    );
+  });
+
+  it('cancels a BigInt denominator before factorization', () => {
+    const common = 9007199254740997n;
+    const factors = primeFactorize(common * 45n, common * 14n);
+    expect(factors).toEqual(
+      new Map([
+        [2, -1],
+        [3, 2],
+        [5, 1],
+        [7, -1],
+      ]),
+    );
+  });
+
+  it('factorizes a negative BigInt ratio', () => {
+    expect(primeFactorize(12n, -5n)).toEqual(
+      new Map([
+        [-1, 1],
+        [2, 2],
+        [3, 1],
+        [5, -1],
+      ]),
+    );
+  });
+
   it('factorizes 1073741823', () => {
     const factors = primeFactorize(1073741823);
     expect(factors).toHaveLength(6);

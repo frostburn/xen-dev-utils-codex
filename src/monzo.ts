@@ -834,11 +834,104 @@ function rhoCascade(n: number) {
 }
 
 /**
- * Factorize a number into a `Map` instace with prime numbers as keys and their multiplicity as values.
- * @param value Rational number to factorize.
+ * Factorize a number into a `Map` instance with prime numbers as keys and their multiplicity as values.
+ *
+ * BigInt inputs are reduced by their denominator before factorization. Known small
+ * prime factors are then removed until the remaining factors fit safely in a
+ * Number.
+ * @param value Rational number or integer numerator to factorize.
+ * @param denominator Optional denominator. It must have the same numeric type as
+ * the numerator.
  * @returns A sparse monzo.
  */
-export function primeFactorize(value: FractionValue): Map<number, number> {
+export function primeFactorize(
+  value: bigint,
+  denominator?: bigint,
+): Map<number, number>;
+export function primeFactorize(
+  value: FractionValue,
+  denominator?: number,
+): Map<number, number>;
+export function primeFactorize(
+  value: FractionValue | bigint,
+  denominator?: number | bigint,
+): Map<number, number> {
+  if (typeof value === 'bigint' || typeof denominator === 'bigint') {
+    if (typeof value !== 'bigint' || typeof denominator === 'number') {
+      throw new TypeError(
+        'BigInt numerator and denominator must both be BigInts.',
+      );
+    }
+    let numerator = value;
+    let divisor = denominator ?? 1n;
+    if (divisor === 0n) {
+      throw new RangeError('Division by zero.');
+    }
+
+    const commonFactor = bigAbs(gcd(numerator, divisor));
+    numerator /= commonFactor;
+    divisor /= commonFactor;
+
+    const result = new Map<number, number>();
+    if (numerator === 0n) {
+      result.set(0, 1);
+      return result;
+    }
+    if (numerator < 0n !== divisor < 0n) {
+      result.set(-1, 1);
+    }
+    numerator = bigAbs(numerator);
+    divisor = bigAbs(divisor);
+
+    for (let i = 0; i < BIG_INT_PRIMES.length; ++i) {
+      const prime = BIG_INT_PRIMES[i];
+      let exponent = 0;
+      while (numerator % prime === 0n) {
+        numerator /= prime;
+        ++exponent;
+      }
+      while (divisor % prime === 0n) {
+        divisor /= prime;
+        --exponent;
+      }
+      if (exponent) {
+        result.set(PRIMES[i], exponent);
+      }
+      if (
+        numerator <= BigInt(Number.MAX_SAFE_INTEGER) &&
+        divisor <= BigInt(Number.MAX_SAFE_INTEGER)
+      ) {
+        break;
+      }
+    }
+
+    if (
+      numerator > BigInt(Number.MAX_SAFE_INTEGER) ||
+      divisor > BigInt(Number.MAX_SAFE_INTEGER)
+    ) {
+      throw new Error(
+        `Factorization not implemented for residuals above ${Number.MAX_SAFE_INTEGER}.`,
+      );
+    }
+
+    const nResult = primeFactorize(Number(numerator));
+    const dResult = primeFactorize(Number(divisor));
+    for (const [prime, exponent] of nResult) {
+      result.set(prime, (result.get(prime) ?? 0) + exponent);
+    }
+    for (const [prime, exponent] of dResult) {
+      const combined = (result.get(prime) ?? 0) - exponent;
+      if (combined) {
+        result.set(prime, combined);
+      } else {
+        result.delete(prime);
+      }
+    }
+    return result;
+  }
+  if (denominator !== undefined) {
+    value = new Fraction(value, denominator);
+  }
   if (typeof value !== 'number' || !Number.isInteger(value)) {
     const {s, n, d} = new Fraction(value);
     const nResult = primeFactorize(s * n);
